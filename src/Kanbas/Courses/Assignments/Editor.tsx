@@ -96,12 +96,12 @@ export default function AssignmentEditor() {
                 <tr>
                     <td></td>
                     <td align="left" valign="top">
-                        <label htmlFor="wd-available-from">Available from</label>
+                        <label htmlFor="wd-available-from">Available to</label>
                         <br />
                         <input id="wd-available-from" type="date" value="2024-05-06" />
                     </td>
                     <td align="left" valign="top">
-                        <label htmlFor="wd-available-until">Available from</label>
+                        <label htmlFor="wd-available-until">Until</label>
                         <br />
                         <input id="wd-available-until" type="date" value="2024-05-20" />
                     </td>
@@ -111,8 +111,8 @@ export default function AssignmentEditor() {
                     <td></td>
                     <td></td>
                     <td>
-                        <button>Save</button>
                         <button>Cancel</button>
+                        <button>Save</button>
                     </td>
                 </tr>
             </table>
