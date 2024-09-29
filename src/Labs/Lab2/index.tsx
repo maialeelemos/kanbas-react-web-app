@@ -10,6 +10,7 @@ import "./index.css";
 import Margins from "./Margins";
 import Padding from "./Padding";
 import Positions from "./Positions";
+import ReactIconsSampler from "./ReactIcons";
 import Zindex from "./Zindex";
 export default function Lab2() {
   return (
@@ -84,6 +85,7 @@ export default function Lab2() {
       <Float />
       <GridLayout />
       <Flex />
+      <ReactIconsSampler />
       
     </div>
   );
