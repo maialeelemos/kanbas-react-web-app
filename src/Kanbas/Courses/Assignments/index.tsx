@@ -5,8 +5,26 @@ import LessonControlButtons from "../Modules/LessonControlButtons";
 import { PiNotePencil } from "react-icons/pi";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoEllipsisVertical } from "react-icons/io5";
+import { useParams } from "react-router";
+import * as db from "../../Database";
 
 export default function Assignments() {
+  const { cid } = useParams();
+  const assignments = db.assignments;
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  function convertToDate(dateTime: string) : string {
+    let hours = new Date(dateTime).getHours();
+    let suffix = "AM";
+    if (hours > 12) {
+      hours = new Date(dateTime).getHours() - 12;
+      suffix = "PM";
+    }
+    return `${monthNames[new Date(dateTime).getMonth()]} 
+    ${new Date(dateTime).getDate()} at 
+    ${hours}:${String(new Date(dateTime).getMinutes()).padStart(2, '0')}${suffix}`
+  }
+
   return (
     <div id="wd-assingnments">
       <AssignmentControls />
@@ -32,65 +50,31 @@ export default function Assignments() {
           </div>
 
           <ul id="wd-assignment-list" className="list-group rounded-0">
-            <li className="wd-assignment-link-item p-3 ps-1 d-flex align-items-center justify-content-between border">
-              <div className="d-flex align-items-center flex-grow-1">
-                <BsGripVertical className="me-4 fs-3" />
-                <PiNotePencil className="me-4 fs-3 text-success" />
-                <a
-                  href="#/Kanbas/Courses/1234/Assignments/123"
-                  className="wd-assignment text-reset text-decoration-none nav-link"
-                >
-                  <span className="wd-assignment-text me-2">
-                    <b>A1</b>
-                    <br />
-                    <span className="text-danger">Multiple Modules</span> |{" "}
-                    <b>Not available until</b> May 6 at 12:00am | <br />
-                    <b>Due</b> May 13 at 11:59pm | 100 pts
-                  </span>
-                  </a>
-              </div>
-              <LessonControlButtons />
-            </li>
-
-            <li className="wd-assignment-link-item p-3 ps-1 d-flex align-items-center justify-content-between border">
-              <div className="d-flex align-items-center flex-grow-1">
-                <BsGripVertical className="me-4 fs-3" />
-                <PiNotePencil className="me-4 fs-3 text-success" />
-                <a
-                  href="#/Kanbas/Courses/1234/Assignments/123"
-                  className="wd-assignment text-reset text-decoration-none"
-                >
-                  <span className="wd-assignment-text me-2">
-                    <b>A2</b>
-                    <br />
-                    <span className="text-danger">Multiple Modules</span> |{" "}
-                    <b>Not available until</b> May 13 at 12:00am | <br />
-                    <b>Due</b> May 20 at 11:59pm | 100 pts
-                  </span>
-                  </a>
-              </div>
-              <LessonControlButtons />
-            </li>
-
-            <li className="wd-assignment-link-item p-3 ps-1 d-flex align-items-center justify-content-between border">
-              <div className="d-flex align-items-center flex-grow-1">
-                <BsGripVertical className="me-4 fs-3" />
-                <PiNotePencil className="me-4 fs-3 text-success" />
-                <a
-                  href="#/Kanbas/Courses/1234/Assignments/123"
-                  className="wd-assignment text-reset text-decoration-none"
-                >
-                  <span className="wd-assignment-text me-2">
-                    <b>A3</b>
-                    <br />
-                    <span className="text-danger">Multiple Modules</span> |{" "}
-                    <b>Not available until</b> May 20 at 12:00am | <br />
-                    <b>Due</b> May 27 at 11:59pm | 100 pts
-                  </span>
-                  </a>
-              </div>
-              <LessonControlButtons />
-            </li>
+            {assignments
+              .filter((assignment: any) => assignment.course === cid)
+              .map((assignment: any) => (
+                <li className="wd-assignment-link-item p-3 ps-1 d-flex align-items-center justify-content-between border">
+                  <div className="d-flex align-items-center flex-grow-1">
+                    <BsGripVertical className="me-4 fs-3" />
+                    <PiNotePencil className="me-4 fs-3 text-success" />
+                    <a
+                      href={`#/Kanbas/Courses/${assignment.course}/Assignments/${assignment._id}`}
+                      className="wd-assignment text-reset text-decoration-none nav-link"
+                    >
+                      <span className="wd-assignment-text me-2">
+                        <b>{assignment.title}</b>
+                        <br />
+                        <span className="text-danger">
+                          Multiple Modules
+                        </span> | <b>Not available until</b> {convertToDate(assignment.availableDateTime)} | 
+                        <br />
+                        <b>Due</b> {convertToDate(assignment.dueDateTime)} | {assignment.points} pts
+                      </span>
+                    </a>
+                  </div>
+                  <LessonControlButtons />
+                </li>
+              ))}
           </ul>
         </li>
       </ul>

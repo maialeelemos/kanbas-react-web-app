@@ -1,24 +1,30 @@
 import { IoIosArrowDown } from "react-icons/io";
+import { useParams } from "react-router";
+import * as db from "../../Database";
+import { Link } from "react-router-dom";
 
 export default function AssignmentEditor() {
+  const { aid } = useParams();
+  const assignments = db.assignments;
+  const assignment = assignments.find((a) => a._id === aid);
+
+  function convertToDate(dateTime: string): string {
+    return dateTime.substring(0,10);
+  }
+
   return (
     <div id="wd-assignments-editor" className="ms-4">
       <label htmlFor="wd-name" className="form-label">
         Assignment Name
       </label>
-      <input id="wd-name" value="A1 - ENV + HTML" className="form-control" />
+      <input id="wd-name" value={assignment?.title} className="form-control" />
       <br />
       <textarea
         id="wd-description"
         className="form-control"
         style={{ height: 200 }}
       >
-        The assignment is available online. Submit a link to the landing page of
-        your Web applicaiton running on Netlify. The landing page should include
-        the following: Your full name and section, Links to each of the lab
-        assignments, Links to the Kanbas application, Links to all relevant
-        source code repositories. The Kanbas application should include a link
-        to navigate back to the landing page.
+        {assignment?.description}
       </textarea>
       <br />
       <div>
@@ -27,7 +33,11 @@ export default function AssignmentEditor() {
             Points
           </label>
           <div className="col-9">
-            <input id="wd-points" value={100} className="form-control" />
+            <input
+              id="wd-points"
+              value={assignment?.points}
+              className="form-control"
+            />
           </div>
         </div>
         <br />
@@ -188,7 +198,11 @@ export default function AssignmentEditor() {
             <input
               id="wd-due-date"
               type="date"
-              value="2024-05-13"
+              value={
+                assignment
+                  ? convertToDate(assignment.dueDateTime)
+                  : "2024-01-01"
+              }
               className="form-control p-2"
             />
           </div>
@@ -201,7 +215,11 @@ export default function AssignmentEditor() {
               <input
                 id="wd-available-from"
                 type="date"
-                value="2024-05-06"
+                value={
+                  assignment
+                    ? convertToDate(assignment.availableDateTime)
+                    : "2024-01-01"
+                }
                 className="form-control p-2"
               />
             </div>
@@ -213,7 +231,11 @@ export default function AssignmentEditor() {
               <input
                 id="wd-available-until"
                 type="date"
-                value="2024-05-20"
+                value={
+                  assignment
+                    ? convertToDate(assignment.untilDateTime)
+                    : "2024-01-01"
+                }
                 className="form-control p-2"
               />
             </div>
@@ -221,12 +243,16 @@ export default function AssignmentEditor() {
         </div>
 
         <div className="mt-3">
-          <button type="button" className="btn btn-danger float-end me-1">
-            Save
-          </button>
+          <Link to={`/Kanbas/Courses/${assignment?.course}/Assignments`}>
+            <button type="button" className="btn btn-danger float-end me-1">
+              Save
+            </button>
+          </Link>
+          <Link to={`/Kanbas/Courses/${assignment?.course}/Assignments`}>
           <button type="button" className="btn btn-secondary float-end me-3">
             Cancel
           </button>
+          </Link>
         </div>
       </div>
     </div>
