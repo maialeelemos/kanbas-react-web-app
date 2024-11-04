@@ -1,4 +1,4 @@
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import AssignmentControls from "./AssignmentControls";
 import { BsGripVertical } from "react-icons/bs";
 import LessonControlButtons from "../Modules/LessonControlButtons";
@@ -6,14 +6,34 @@ import { PiNotePencil } from "react-icons/pi";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { useParams } from "react-router";
-import * as db from "../../Database";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteAssignment, editAssignment } from "./reducer";
+import AssignmentEditorDialog from "./AssignmentEditorDislog";
 
 export default function Assignments() {
   const { cid } = useParams();
-  const assignments = db.assignments;
-  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const dispatch = useDispatch();
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const isFaculty = () => {
+    return currentUser.role === "FACULTY";
+  };
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
-  function convertToDate(dateTime: string) : string {
+  function convertToDate(dateTime: string): string {
     let hours = new Date(dateTime).getHours();
     let suffix = "AM";
     if (hours > 12) {
@@ -22,7 +42,10 @@ export default function Assignments() {
     }
     return `${monthNames[new Date(dateTime).getMonth()]} 
     ${new Date(dateTime).getDate()} at 
-    ${hours}:${String(new Date(dateTime).getMinutes()).padStart(2, '0')}${suffix}`
+    ${hours}:${String(new Date(dateTime).getMinutes()).padStart(
+      2,
+      "0"
+    )}${suffix}`;
   }
 
   return (
@@ -60,18 +83,36 @@ export default function Assignments() {
                     <a
                       href={`#/Kanbas/Courses/${assignment.course}/Assignments/${assignment._id}`}
                       className="wd-assignment text-reset text-decoration-none nav-link"
+                      onClick={() => isFaculty() && dispatch(editAssignment(assignment._id))}
                     >
                       <span className="wd-assignment-text me-2">
                         <b>{assignment.title}</b>
                         <br />
                         <span className="text-danger">
                           Multiple Modules
-                        </span> | <b>Not available until</b> {convertToDate(assignment.availableDateTime)} | 
+                        </span> | <b>Not available until</b>{" "}
+                        {convertToDate(assignment.availableDateTime)} |
                         <br />
-                        <b>Due</b> {convertToDate(assignment.dueDateTime)} | {assignment.points} pts
+                        <b>Due</b> {convertToDate(assignment.dueDateTime)} |{" "}
+                        {assignment.points} pts
                       </span>
                     </a>
                   </div>
+                  {isFaculty() && (
+                    <span>
+                      <FaTrash
+                        className="text-danger me-2 mb-1"
+                        data-bs-toggle="modal"
+                        data-bs-target="#wd-add-assignment-dialog"
+                      />
+                      <AssignmentEditorDialog
+                        dialogTitle="Delete Assignment?"
+                        deleteAssignment={() =>
+                          dispatch(deleteAssignment(assignment._id))
+                        }
+                      />
+                    </span>
+                  )}
                   <LessonControlButtons />
                 </li>
               ))}

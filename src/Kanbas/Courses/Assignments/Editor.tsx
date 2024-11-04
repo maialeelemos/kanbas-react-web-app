@@ -1,15 +1,35 @@
 import { IoIosArrowDown } from "react-icons/io";
 import { useParams } from "react-router";
-import * as db from "../../Database";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addAssignment, updateAssignment } from "./reducer";
+import { useState } from "react";
 
 export default function AssignmentEditor() {
-  const { aid } = useParams();
-  const assignments = db.assignments;
-  const assignment = assignments.find((a) => a._id === aid);
+  const { aid, cid } = useParams();
+  const dispatch = useDispatch();
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+  const [assignment, setAssignment] = useState(() => {
+    return (
+      assignments.find((a: any) => a._id === aid) || {
+        course: cid,
+        _id: aid,
+        title: "Assignment Name",
+        description: "New Assignment Description",
+        points: "100",
+        dueDateTime: "",
+        availableDateTime: "",
+        untilDateTime: "",
+      }
+    );
+  });
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const isFaculty = () => {
+    return currentUser.role === "FACULTY";
+  };
 
   function convertToDate(dateTime: string): string {
-    return dateTime.substring(0,10);
+    return dateTime === undefined ? "" : dateTime.substring(0, 10);
   }
 
   return (
@@ -17,12 +37,23 @@ export default function AssignmentEditor() {
       <label htmlFor="wd-name" className="form-label">
         Assignment Name
       </label>
-      <input id="wd-name" value={assignment?.title} className="form-control" />
+      <input
+        id="wd-name"
+        value={assignment.title}
+        className="form-control"
+        onChange={(e) =>
+          setAssignment({ ...assignment, title: e.target.value })
+        }
+      />
       <br />
       <textarea
         id="wd-description"
         className="form-control"
         style={{ height: 200 }}
+        value={assignment.description}
+        onChange={(e) =>
+          setAssignment({ ...assignment, description: e.target.value })
+        }
       >
         {assignment?.description}
       </textarea>
@@ -35,8 +66,11 @@ export default function AssignmentEditor() {
           <div className="col-9">
             <input
               id="wd-points"
-              value={assignment?.points}
+              value={assignment.points}
               className="form-control"
+              onChange={(e) =>
+                setAssignment({ ...assignment, points: e.target.value })
+              }
             />
           </div>
         </div>
@@ -198,12 +232,11 @@ export default function AssignmentEditor() {
             <input
               id="wd-due-date"
               type="date"
-              value={
-                assignment
-                  ? convertToDate(assignment.dueDateTime)
-                  : "2024-01-01"
-              }
+              value={assignment ? convertToDate(assignment.dueDateTime) : ""}
               className="form-control p-2"
+              onChange={(e) =>
+                setAssignment({ ...assignment, dueDateTime: e.target.value })
+              }
             />
           </div>
 
@@ -216,11 +249,15 @@ export default function AssignmentEditor() {
                 id="wd-available-from"
                 type="date"
                 value={
-                  assignment
-                    ? convertToDate(assignment.availableDateTime)
-                    : "2024-01-01"
+                  assignment ? convertToDate(assignment.availableDateTime) : ""
                 }
                 className="form-control p-2"
+                onChange={(e) =>
+                  setAssignment({
+                    ...assignment,
+                    availableDateTime: e.target.value,
+                  })
+                }
               />
             </div>
 
@@ -232,28 +269,60 @@ export default function AssignmentEditor() {
                 id="wd-available-until"
                 type="date"
                 value={
-                  assignment
-                    ? convertToDate(assignment.untilDateTime)
-                    : "2024-01-01"
+                  assignment ? convertToDate(assignment.untilDateTime) : ""
                 }
                 className="form-control p-2"
+                onChange={(e) =>
+                  setAssignment({
+                    ...assignment,
+                    untilDateTime: e.target.value,
+                  })
+                }
               />
             </div>
           </div>
         </div>
 
-        <div className="mt-3">
-          <Link to={`/Kanbas/Courses/${assignment?.course}/Assignments`}>
-            <button type="button" className="btn btn-danger float-end me-1">
-              Save
-            </button>
-          </Link>
-          <Link to={`/Kanbas/Courses/${assignment?.course}/Assignments`}>
-          <button type="button" className="btn btn-secondary float-end me-3">
-            Cancel
-          </button>
-          </Link>
-        </div>
+        {isFaculty() && (
+          <div className="mt-3">
+            <Link to={`/Kanbas/Courses/${assignment?.course}/Assignments`}>
+              <button
+                type="button"
+                className="btn btn-danger float-end me-1"
+                onClick={() => {
+                  assignment.editing
+                    ? dispatch(
+                        updateAssignment({ ...assignment, editing: false })
+                      )
+                    : dispatch(
+                        addAssignment({
+                          course: cid,
+                          _id: aid,
+                          title: assignment.title,
+                          description: assignment.description,
+                          points: assignment.points,
+                          dueDateTime: assignment.dueDateTime,
+                          availableDateTime: assignment.availableDateTime,
+                          untilDateTime: assignment.untilDateTime,
+                        })
+                      );
+                  setAssignment({});
+                }}
+              >
+                Save
+              </button>
+            </Link>
+            <Link to={`/Kanbas/Courses/${assignment?.course}/Assignments`}>
+              <button
+                type="button"
+                className="btn btn-secondary float-end me-3"
+                onClick={() => setAssignment({})}
+              >
+                Cancel
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
