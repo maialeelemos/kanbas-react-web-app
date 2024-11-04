@@ -20,7 +20,7 @@ export default function Profile() {
     fetchProfile();
   }, []);
   function convertToDate(dateTime: string): string {
-    return dateTime.substring(0,10);
+    return dateTime === undefined ? "" : dateTime.substring(0, 10);
   }
   return (
     <div id="wd-profile-screen">

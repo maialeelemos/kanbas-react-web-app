@@ -8,7 +8,7 @@ import { IoEllipsisVertical } from "react-icons/io5";
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAssignment, editAssignment } from "./reducer";
-import AssignmentEditorDialog from "./AssignmentEditorDislog";
+import AssignmentEditorDialog from "./AssignmentEditorDialog";
 
 export default function Assignments() {
   const { cid } = useParams();
@@ -102,14 +102,12 @@ export default function Assignments() {
                     <span>
                       <FaTrash
                         className="text-danger me-2 mb-1"
-                        data-bs-toggle="modal"
-                        data-bs-target="#wd-add-assignment-dialog"
-                      />
-                      <AssignmentEditorDialog
-                        dialogTitle="Delete Assignment?"
-                        deleteAssignment={() =>
-                          dispatch(deleteAssignment(assignment._id))
-                        }
+                        onClick={() => {
+                          const remove = window.confirm("Delete Assignment?");
+                          if(remove) {
+                            dispatch(deleteAssignment(assignment._id))
+                          }
+                        }}
                       />
                     </span>
                   )}
