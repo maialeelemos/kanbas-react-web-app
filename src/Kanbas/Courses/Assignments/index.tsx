@@ -8,7 +8,6 @@ import { IoEllipsisVertical } from "react-icons/io5";
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAssignment, editAssignment } from "./reducer";
-import AssignmentEditorDialog from "./AssignmentEditorDialog";
 
 export default function Assignments() {
   const { cid } = useParams();

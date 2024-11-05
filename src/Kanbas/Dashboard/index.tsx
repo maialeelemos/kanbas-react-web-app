@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { addEnrollment, deleteEnrollment } from "./reducer";
@@ -45,14 +45,15 @@ export default function Dashboard({
         enrollment.user === currentUser._id && enrollment.course === c._id
     );
   }
-  const navigate = useNavigate();
-  function navigateOnEnrollment(course: any) {
+  function navigateOnEnrollment(course: any): string {
     const isEnrolled = enrollments.some(
       (enrollment: any) =>
         enrollment.user === currentUser._id && enrollment.course === course._id
     );
     if(isEnrolled) {
-      navigate(`/Kanbas/Courses/${course._id}/Home`)
+      return `/Kanbas/Courses/${course._id}/Home`
+    } else {
+    return "";
     }
   }
   return (
@@ -116,9 +117,9 @@ export default function Dashboard({
               style={{ width: "270px" }}
             >
               <div className="card rounded-3 overflow-hidden">
-                <div
-                  onClick={() => navigateOnEnrollment(course)}
+              <Link
                   className="wd-dashboard-course-link text-decoration-none text-dark overflow-hidden"
+                  to={navigateOnEnrollment(course)}
                 >
                   <img
                     src={`/images/${
@@ -126,6 +127,7 @@ export default function Dashboard({
                     }`}
                     width="100%"
                     height={160}
+                    alt="course"
                   />
                   <div className="card-body">
                     <h5 className="wd-dashboard-course-title card-title">
@@ -187,7 +189,7 @@ export default function Dashboard({
                       </span>
                     )}
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
           ))}
