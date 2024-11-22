@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
-import { addEnrollment, deleteEnrollment } from "./reducer";
+import { useEffect, useState } from "react";
+import { addEnrollment, deleteEnrollment, setEnrollments } from "./reducer";
+import * as enrollmentsClient from "../Dashboard/client";
 
 export default function Dashboard({
   courses,
@@ -39,12 +40,31 @@ export default function Dashboard({
       (enrollment: any) =>
         enrollment.user === currentUser._id && enrollment.course === course._id
     );
-    if(isEnrolled) {
-      return `/Kanbas/Courses/${course._id}/Home`
+    if (isEnrolled) {
+      return `/Kanbas/Courses/${course._id}/Home`;
     } else {
-    return "";
+      return "";
     }
   }
+
+  const fetchEnrollments = async () => {
+    const enrollments = await enrollmentsClient.getEnrollments();
+    dispatch(setEnrollments(enrollments));
+  };
+  useEffect(() => {
+    fetchEnrollments();
+  }, []);
+
+  const removeEnrollment = async (courseId: string) => {
+    await enrollmentsClient.unenrollInCourse(courseId, currentUser._id);
+    dispatch(deleteEnrollment({ user: currentUser._id, course: courseId }));
+  };
+
+  const enrollUser = async (courseId: string) => {
+    await enrollmentsClient.enrollInCourse(courseId, currentUser._id);
+    dispatch(addEnrollment({ user: currentUser._id, course: courseId }));
+  };
+
   return (
     <div id="wd-dashboard">
       <h1 id="wd-dashboard-title">Dashboard</h1>
@@ -94,9 +114,7 @@ export default function Dashboard({
           <hr />
         </div>
       )}
-      <h2 id="wd-dashboard-published">
-        Published Courses ({courses.length})
-      </h2>
+      <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2>
       <hr />
       <div id="wd-dashboard-courses" className="row">
         <div className="row row-cols-1 row-cols-md-5 g-4">
@@ -106,7 +124,7 @@ export default function Dashboard({
               style={{ width: "270px" }}
             >
               <div className="card rounded-3 overflow-hidden">
-              <Link
+                <Link
                   className="wd-dashboard-course-link text-decoration-none text-dark overflow-hidden"
                   to={navigateOnEnrollment(course)}
                 >
@@ -135,7 +153,7 @@ export default function Dashboard({
                         className="btn btn-danger"
                         onClick={(event) => {
                           event.preventDefault();
-                          dispatch(deleteEnrollment({ user: currentUser._id, course: course._id }))
+                          removeEnrollment(course._id);
                         }}
                       >
                         {" "}
@@ -146,7 +164,7 @@ export default function Dashboard({
                         className="btn btn-success"
                         onClick={(event) => {
                           event.preventDefault();
-                          dispatch(addEnrollment({ user: currentUser._id, course: course._id }))
+                          enrollUser(course._id);
                         }}
                       >
                         {" "}
