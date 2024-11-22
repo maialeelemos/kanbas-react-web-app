@@ -7,7 +7,15 @@ import { IoIosArrowDown } from "react-icons/io";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteAssignment, editAssignment } from "./reducer";
+import {
+  deleteAssignment,
+  editAssignment,
+  setAssignments,
+  updateAssignment,
+} from "./reducer";
+import * as assignmentsClient from "./client";
+import { useEffect } from "react";
+import * as coursesClient from "../client";
 
 export default function Assignments() {
   const { cid } = useParams();
@@ -47,6 +55,21 @@ export default function Assignments() {
     )}${suffix}`;
   }
 
+  const removeAssignment = async (assignmentId: string) => {
+    await assignmentsClient.deleteAssignment(assignmentId);
+    dispatch(deleteAssignment(assignmentId));
+  };
+
+  const fetchAssignments = async () => {
+    const assignments = await coursesClient.findAssignmentsForCourse(
+      cid as string
+    );
+    dispatch(setAssignments(assignments));
+  };
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
+
   return (
     <div id="wd-assingnments">
       <AssignmentControls />
@@ -72,47 +95,47 @@ export default function Assignments() {
           </div>
 
           <ul id="wd-assignment-list" className="list-group rounded-0">
-            {assignments
-              .filter((assignment: any) => assignment.course === cid)
-              .map((assignment: any) => (
-                <li className="wd-assignment-link-item p-3 ps-1 d-flex align-items-center justify-content-between border">
-                  <div className="d-flex align-items-center flex-grow-1">
-                    <BsGripVertical className="me-4 fs-3" />
-                    <PiNotePencil className="me-4 fs-3 text-success" />
-                    <a
-                      href={`#/Kanbas/Courses/${assignment.course}/Assignments/${assignment._id}`}
-                      className="wd-assignment text-reset text-decoration-none nav-link"
-                      onClick={() => isFaculty() && dispatch(editAssignment(assignment._id))}
-                    >
-                      <span className="wd-assignment-text me-2">
-                        <b>{assignment.title}</b>
-                        <br />
-                        <span className="text-danger">
-                          Multiple Modules
-                        </span> | <b>Not available until</b>{" "}
-                        {convertToDate(assignment.availableDateTime)} |
-                        <br />
-                        <b>Due</b> {convertToDate(assignment.dueDateTime)} |{" "}
-                        {assignment.points} pts
-                      </span>
-                    </a>
-                  </div>
-                  {isFaculty() && (
-                    <span>
-                      <FaTrash
-                        className="text-danger me-2 mb-1"
-                        onClick={() => {
-                          const remove = window.confirm("Delete Assignment?");
-                          if(remove) {
-                            dispatch(deleteAssignment(assignment._id))
-                          }
-                        }}
-                      />
+            {assignments.map((assignment: any) => (
+              <li className="wd-assignment-link-item p-3 ps-1 d-flex align-items-center justify-content-between border">
+                <div className="d-flex align-items-center flex-grow-1">
+                  <BsGripVertical className="me-4 fs-3" />
+                  <PiNotePencil className="me-4 fs-3 text-success" />
+                  <a
+                    href={`#/Kanbas/Courses/${assignment.course}/Assignments/${assignment._id}`}
+                    className="wd-assignment text-reset text-decoration-none nav-link"
+                    onClick={() =>
+                      isFaculty() && dispatch(editAssignment(assignment._id))
+                    }
+                  >
+                    <span className="wd-assignment-text me-2">
+                      <b>{assignment.title}</b>
+                      <br />
+                      <span className="text-danger">
+                        Multiple Modules
+                      </span> | <b>Not available until</b>{" "}
+                      {convertToDate(assignment.availableDateTime)} |
+                      <br />
+                      <b>Due</b> {convertToDate(assignment.dueDateTime)} |{" "}
+                      {assignment.points} pts
                     </span>
-                  )}
-                  <LessonControlButtons />
-                </li>
-              ))}
+                  </a>
+                </div>
+                {isFaculty() && (
+                  <span>
+                    <FaTrash
+                      className="text-danger me-2 mb-1"
+                      onClick={() => {
+                        const remove = window.confirm("Delete Assignment?");
+                        if (remove) {
+                          removeAssignment(assignment._id);
+                        }
+                      }}
+                    />
+                  </span>
+                )}
+                <LessonControlButtons />
+              </li>
+            ))}
           </ul>
         </li>
       </ul>

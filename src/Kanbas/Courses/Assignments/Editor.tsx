@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addAssignment, updateAssignment } from "./reducer";
 import { useState } from "react";
+import * as coursesClient from "../../Courses/client";
+import * as assignmentClient from "../Assignments/client";
 
 export default function AssignmentEditor() {
   const { aid, cid } = useParams();
@@ -31,6 +33,20 @@ export default function AssignmentEditor() {
   function convertToDate(dateTime: string): string {
     return dateTime === undefined ? "" : dateTime.substring(0, 10);
   }
+
+  const createAssignmentForCourse = async () => {
+    if (!cid) return;
+    const assignemnt = await coursesClient.createAssignmentForCourse(
+      cid,
+      assignment
+    );
+    dispatch(addAssignment(assignemnt));
+  };
+
+  const saveAssignment = async (assignment: any) => {
+    await assignmentClient.updateAssignment(assignment);
+    dispatch(updateAssignment(assignment));
+  };
 
   return (
     <div id="wd-assignments-editor" className="ms-4">
@@ -291,21 +307,8 @@ export default function AssignmentEditor() {
                 className="btn btn-danger float-end me-1"
                 onClick={() => {
                   assignment.editing
-                    ? dispatch(
-                        updateAssignment({ ...assignment, editing: false })
-                      )
-                    : dispatch(
-                        addAssignment({
-                          course: cid,
-                          _id: aid,
-                          title: assignment.title,
-                          description: assignment.description,
-                          points: assignment.points,
-                          dueDateTime: assignment.dueDateTime,
-                          availableDateTime: assignment.availableDateTime,
-                          untilDateTime: assignment.untilDateTime,
-                        })
-                      );
+                    ? saveAssignment({ ...assignment, editing: false })
+                    : createAssignmentForCourse();
                   setAssignment({});
                 }}
               >
