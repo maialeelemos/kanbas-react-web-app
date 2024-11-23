@@ -23,18 +23,34 @@ export default function Dashboard({
   const { enrollments } = useSelector((state: any) => state.enrollmentsReducer); // TODO: Do I delete this?
   const [showEnrolled, setShowEnrolled] = useState(true);
   const dispatch = useDispatch();
+
   const isFaculty = () => {
     return currentUser.role === "FACULTY";
   };
+
   const isStudent = () => {
     return currentUser.role === "STUDENT";
   };
+
+  function getFilteredStudentCourses(shouldFilter: boolean): any[] {
+    return shouldFilter
+      ? courses.filter((course) =>
+          enrollments.some(
+            (enrollment: any) =>
+              enrollment.user === currentUser._id &&
+              enrollment.course === course._id
+          )
+        )
+      : courses;
+  }
+
   function isEnrolledCourse(c: any) {
     return enrollments.some(
       (enrollment: any) =>
         enrollment.user === currentUser._id && enrollment.course === c._id
     );
   }
+
   function navigateOnEnrollment(course: any): string {
     const isEnrolled = enrollments.some(
       (enrollment: any) =>
@@ -114,11 +130,13 @@ export default function Dashboard({
           <hr />
         </div>
       )}
-      <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2>
+      <h2 id="wd-dashboard-published">
+        Published Courses ({getFilteredStudentCourses(showEnrolled).length})
+      </h2>
       <hr />
       <div id="wd-dashboard-courses" className="row">
         <div className="row row-cols-1 row-cols-md-5 g-4">
-          {courses.map((course) => (
+          {getFilteredStudentCourses(showEnrolled).map((course) => (
             <div
               className="wd-dashboard-course col mt-4"
               style={{ width: "270px" }}
