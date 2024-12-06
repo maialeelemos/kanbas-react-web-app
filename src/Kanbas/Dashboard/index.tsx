@@ -1,8 +1,5 @@
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { addEnrollment, deleteEnrollment, setEnrollments } from "./reducer";
-import * as enrollmentsClient from "../Dashboard/client";
 
 export default function Dashboard({
   courses,
@@ -26,7 +23,6 @@ export default function Dashboard({
   updateEnrollment: (courseId: string, enrolled: boolean) => void;
 }) {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const { enrollments } = useSelector((state: any) => state.enrollmentsReducer); // TODO: Do I delete this?
   const dispatch = useDispatch();
 
   const isFaculty = () => {
@@ -40,16 +36,6 @@ export default function Dashboard({
   function navigateOnEnrollment(course: any): string {
     return `/Kanbas/Courses/${course._id}/Home`;
   }
-
-  const removeEnrollment = async (courseId: string) => {
-    await enrollmentsClient.unenrollInCourse(courseId, currentUser._id);
-    dispatch(deleteEnrollment({ user: currentUser._id, course: courseId }));
-  };
-
-  const enrollUser = async (courseId: string) => {
-    await enrollmentsClient.enrollInCourse(courseId, currentUser._id);
-    dispatch(addEnrollment({ user: currentUser._id, course: courseId }));
-  };
 
   return (
     <div id="wd-dashboard">

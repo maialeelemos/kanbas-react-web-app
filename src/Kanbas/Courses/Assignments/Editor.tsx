@@ -248,7 +248,11 @@ export default function AssignmentEditor() {
             <input
               id="wd-due-date"
               type="date"
-              value={assignment ? convertToDate(assignment.dueDateTime) : ""}
+              value={
+                assignment && assignment.dueDateTime
+                  ? convertToDate(assignment.dueDateTime)
+                  : ""
+              }
               className="form-control p-2"
               onChange={(e) =>
                 setAssignment({ ...assignment, dueDateTime: e.target.value })
@@ -265,7 +269,9 @@ export default function AssignmentEditor() {
                 id="wd-available-from"
                 type="date"
                 value={
-                  assignment ? convertToDate(assignment.availableDateTime) : ""
+                  assignment && assignment.availableDateTime
+                    ? convertToDate(assignment.availableDateTime)
+                    : ""
                 }
                 className="form-control p-2"
                 onChange={(e) =>
@@ -285,7 +291,9 @@ export default function AssignmentEditor() {
                 id="wd-available-until"
                 type="date"
                 value={
-                  assignment ? convertToDate(assignment.untilDateTime) : ""
+                  assignment && assignment.untilDateTime
+                    ? convertToDate(assignment.untilDateTime)
+                    : ""
                 }
                 className="form-control p-2"
                 onChange={(e) =>

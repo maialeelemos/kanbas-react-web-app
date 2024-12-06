@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import PeopleTable from "../Courses/People/Table";
 import * as client from "./client";
+import * as coursesClient from "../Courses/client";
 import { FaPlus } from "react-icons/fa";
 export default function Users() {
+  const { cid } = useParams();
   const [users, setUsers] = useState<any[]>([]);
   const { uid } = useParams();
   const [role, setRole] = useState("");
@@ -24,8 +26,8 @@ export default function Users() {
 
   const filterUsersByName = async (name: string) => {
     setName(name);
-    if (name) {
-      const users = await client.findUsersByPartialName(name);
+    if (name && cid !== undefined) {
+      const users = await client.findUsersByPartialName(name, cid);
       setUsers(users);
     } else {
       fetchUsers();
@@ -34,8 +36,8 @@ export default function Users() {
 
   const filterUsersByRole = async (role: string) => {
     setRole(role);
-    if (role) {
-      const users = await client.findUsersByRole(role);
+    if (role && cid !== undefined) {
+      const users = await client.findUsersByRole(role, cid);
       setUsers(users);
     } else {
       fetchUsers();
@@ -43,8 +45,10 @@ export default function Users() {
   };
 
   const fetchUsers = async () => {
-    const users = await client.findAllUsers();
-    setUsers(users);
+    if (cid !== undefined) {
+      const users = await coursesClient.findUsersForCourse(cid);
+      setUsers(users);
+    }
   };
   useEffect(() => {
     fetchUsers();

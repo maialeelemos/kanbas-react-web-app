@@ -8,6 +8,13 @@ export const findAllUsers = async () => {
   return response.data;
 };
 
+// export const findUsersForCourse = async (courseId: string) => {
+//   const response = await axiosWithCredentials.get(
+//     `${USERS_API}?course=${courseId}`
+//   );
+//   return response.data;
+// };
+
 export const createCourse = async (course: any) => {
   const { data } = await axiosWithCredentials.post(
     `${USERS_API}/current/courses`,
@@ -54,13 +61,13 @@ export const signout = async () => {
   return response.data;
 };
 
-export const findUsersByRole = async (role: string) => {
-  const response = await axios.get(`${USERS_API}?role=${role}`);
+export const findUsersByRole = async (role: string, courseId: string) => {
+  const response = await axios.get(`${USERS_API}?role=${role}&course=${courseId}`);
   return response.data;
 };
 
-export const findUsersByPartialName = async (name: string) => {
-  const response = await axios.get(`${USERS_API}?name=${name}`);
+export const findUsersByPartialName = async (name: string, courseId: string) => {
+  const response = await axios.get(`${USERS_API}?name=${name}&course=${courseId}`);
   return response.data;
 };
 
