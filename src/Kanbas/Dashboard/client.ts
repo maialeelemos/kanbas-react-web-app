@@ -11,9 +11,3 @@ export const unenrollInCourse = async (courseId: string, userId: string) => {
   const response = await axios.delete(`${ENROLLMENTS_API}/${courseId}/${userId}`);
   return response.data;
 };
-
-export const getEnrollments = async () => {
-    const response = await axios.get(`${ENROLLMENTS_API}`);
-    return response.data;
-};
-
